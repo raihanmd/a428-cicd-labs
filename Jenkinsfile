@@ -2,9 +2,9 @@ pipeline {
     agent any
 
     environment {
-        SSH_KEY_PATH = '/home/.ssh/lynxdeveloper471.pem'
         SSH_USERNAME = 'lynxdev'
         SSH_HOST = '103.150.197.107'
+        SSH_KEY_PATH = '/home/.ssh/lynxdeveloper471.pem'
     }
 
     stages {
@@ -54,20 +54,14 @@ pipeline {
                 echo 'Deploying to VPS...'
 
                 sh '''
-                    whoami
-                    ls -l -a /home
-                    mkdir -p /var/jenkins_home/.ssh
-                    chmod 700 /var/jenkins_home/.ssh
-                    touch /var/jenkins_home/.ssh/known_hosts
-                    chmod 644 /var/jenkins_home/.ssh/known_hosts
-                    ssh-keyscan ${SSH_HOST} >> ~/.ssh/known_hosts
-                    ssh -i "$SSH_KEY_PATH" ${SSH_USERNAME}@${SSH_HOST}
+                    cp $SSH_KEY_PATH ~/.ssh/id_rsa
+                    chmod 600 ~/.ssh/id_rsa
+                    ssh -i ~/.ssh/id_rsa ${SSH_USERNAME}@${SSH_HOST}
+                    ls -la
+                    ./deploy.sh
+                    exit
+                    rm ~/.ssh/id_rsa
                 '''
-
-                // sh '''
-                //     chmod +x ./jenkins/scripts/deploy-to-vps.sh
-                //     ./jenkins/scripts/deploy-to-vps.sh
-                // '''
             }
         }
     }
