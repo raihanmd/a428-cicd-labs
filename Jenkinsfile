@@ -1,32 +1,46 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:lts-buster-slim'
+            args '-p 3000:3000'
+        }
+    }
+
+    environment {
+        SSH_KEY_PATH = '/home/lynxdeveloper471.pem'
+        SSH_USERNAME = 'lynxdev'
+        SSH_HOST = '103.150.197.107'
+    }
+
     stages {
-        stage('Clone Repository') {
+        stage('Build') {
             steps {
-                git branch: 'main', url: 'https://github.com/username/repo-name.git'
+                sh 'npm install'
             }
         }
-        stage('Install Dependencies') {
+        stage('Test') {
             steps {
-                sh 'yarn install'
+                sh './jenkins/scripts/test.sh'
             }
         }
-        stage('Build React App') {
+       stage('Delivery') {
             steps {
-                sh 'yarn build'
+                sh './jenkins/scripts/deliver.sh'
+                echo 'Waiting for 60 seconds...'
+                sh 'sleep 60'
+                echo 'Stopping the application...'
+                sh './jenkins/scripts/kill.sh'
             }
         }
-        stage('Deploy to Render') {
+        stage('Manual Approval') {
             steps {
-                withCredentials([string(credentialsId: 'render_api_key', variable: 'RENDER_API_KEY')]) {
-                    sh '''
-                    curl -X POST \
-                         -H "Authorization: Bearer $RENDER_API_KEY" \
-                         -H "Content-Type: application/json" \
-                         -d '{}' \
-                         https://api.render.com/deploy/srv-<YOUR_SERVICE_ID>
-                    '''
-                }
+                input message: 'Lanjutkan ke tahap Deploy? (Klik Proceed untuk melanjutkan, atau Abort untuk menghentikan pipeline)'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                echo 'Deploying to VPS...'
+                sh './jenkins/scripts/deploy-to-vps.sh'
             }
         }
     }
