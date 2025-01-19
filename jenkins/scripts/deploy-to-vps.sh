@@ -1,12 +1,7 @@
 #!/bin/bash
 
-if [[ -z "$SSH_KEY_PATH" || -z "$SSH_USERNAME" || -z "$SSH_HOST" ]]; then
-  echo "Error: Environment variables SSH_KEY_PATH, SSH_USERNAME, and SSH_HOST must be set."
-  exit 1
-fi
-
-echo Deploy on VPS
-ssh -i "$SSH_KEY_PATH" ${SSH_USERNAME}@${SSH_HOST} "bash -s" < ./deploy.sh
-
-
+cp $SSH_KEY_PATH ~/.ssh/id_rsa
+chmod 600 ~/.ssh/id_rsa
+ssh -i ~/.ssh/id_rsa $SSH_USERNAME@$SSH_HOST "./deploy.sh"
+rm ~/.ssh/id_rsa
 
