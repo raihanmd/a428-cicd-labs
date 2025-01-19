@@ -52,7 +52,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying to VPS...'
-
+                sh 'chmod +x ./jenkins/scripts/*'
                 sh './jenkins/scripts/deploy-to-vps.sh'
             }
         }
