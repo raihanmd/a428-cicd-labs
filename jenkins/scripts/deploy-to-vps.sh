@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env sh
 
 cp $SSH_KEY_PATH ~/.ssh/id_rsa
 chmod 600 ~/.ssh/id_rsa
