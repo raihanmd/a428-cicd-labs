@@ -39,7 +39,7 @@ pipeline {
                 sh './jenkins/scripts/deliver.sh'
                 echo 'Visit http://localhost:3000 to see your Node.js/React application in action.'
                 echo 'Waiting for 60 seconds...'
-                // sh 'sleep 60'
+                sh 'sleep 60'
                 echo 'Stopping the application in jenkins env'
                 sh './jenkins/scripts/kill.sh'
             }
@@ -56,10 +56,7 @@ pipeline {
                 sh '''
                     cp $SSH_KEY_PATH ~/.ssh/id_rsa
                     chmod 600 ~/.ssh/id_rsa
-                    ssh -i ~/.ssh/id_rsa ${SSH_USERNAME}@${SSH_HOST}
-                    ls -la
-                    ./deploy.sh
-                    exit
+                    ssh -i ~/.ssh/id_rsa $SSH_USERNAME@$SSH_HOST "./deploy.sh"
                     rm ~/.ssh/id_rsa
                 '''
             }
